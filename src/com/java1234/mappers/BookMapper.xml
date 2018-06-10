@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java1234.dao.BookDao">
+
+	<resultMap type="Book" id="BookResult">
+		<result property="id" column="id"/>
+		<result property="bookName" column="bookName"/>
+		<result property="bookAuthor" column="bookAuthor"/>
+		<result property="publisher" column="publisher"/>
+	</resultMap>
+	
+	
+	<!-- //返回数据库里总条数
+	 public int count();  -->
+	  <select id="count" resultType="Integer">  
+        select count(*) from t_book  
+    </select>  
+	
+	<!-- 
+	 //在数据库里查找分页里显示的数据
+	public List<Book> searchBook(Map<String,Object> map); -->
+	
+	<select id="searchBook" parameterType="Map" resultMap="BookResult">
+		select * from t_book
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<!-- //计算查询总数
+	public Integer bookCountByQueryVo(QueryVo queryVo);-->
+	
+	
+	<select id="bookCountByQueryVo" parameterType="QueryVo" resultType="Integer">
+		select count(1) from t_book
+		<where>
+			<if test="id != null and id != ''">
+				id = #{id}
+			</if>
+			<if test="bookName != null and bookName != ''">
+				bookName like "%"#{bookName}"%"
+			</if>
+			<if test="bookAuthor != null and bookAuthor != ''">
+				and bookAuthor = #{bookAuthor}
+			</if>
+			<if test="publisher != null and publisher != ''">
+				and publisher = #{publisher}
+			</if>
+		</where>
+	</select>
+	
+	<!-- //查找所有书籍
+		public List<Book> find(QueryVo queryVo); -->
+	
+	 <select id="find" parameterType="QueryVo" resultMap="BookResult">
+	 select * from t_book
+	 <where>
+	  <if test="id!=null and id!=''">
+	     id=#{id}
+	 </if>
+	 <if test="bookName!=null and bookName!=''">
+	     and bookName like"%"#{bookName}"%"
+	 </if>
+	  <if test="bookAuthor!=null and bookAuthor!=''">
+	     and bookAuthor=#{bookAuthor}
+	 </if>
+	  <if test="publisher!=null  and publisher!=''">
+	     and publisher=#{publisher}
+	 </if>
+	 </where>
+	    limit #{startRow},#{size}
+	 </select>
+	 
+	 
+	 
+	<!-- 
+	//通过id查找书本
+	public Book getBookById(Integer id); --> 
+	
+	<select id="getBookById" parameterType="Integer" resultType="Book" >
+	select *from t_book where id=#{id}
+	
+	</select>
+	
+	
+	<!--  //更新数据库里面这个书的信息并返回更新信息
+	public void updateBook(Book book); -->
+	
+	 <update id="updateBook" parameterType="Book"  >
+	   update t_book
+	   <set>
+        <if test="bookName!=null">
+	       bookName=#{bookName},
+	   </if> 
+	      <if test="bookAuthor!=null">
+	       bookAuthor=#{bookAuthor},
+	   </if> 
+	      <if test="publisher!=null">
+	       publisher=#{publisher},
+	   </if>     
+	    </set>
+	    where id=#{id}
+	 </update>
+	 
+	<!--   //根据ID在数据库删除这本书的信息
+	public int delete(Integer id);--> 
+	
+	<delete id="delete" parameterType="Integer">
+	delete from t_book where id=#{id}
+	</delete>
+	
+		
+	<!-- //往数据库里添加数据
+	public int add(Book book); -->
+	
+	
+	<insert id="add" parameterType="Book"  >
+		insert into t_book values(null,#{bookName},#{bookAuthor},#{publisher})
+	</insert>
+	
+	
+
+</mapper> 
